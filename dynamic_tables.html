@@ -1,0 +1,236 @@
+<HTML>
+<HEAD>
+	<TITLE> HW 20200808 - Add/Remove dynamic rows in HTML table </TITLE>
+	 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	 
+	 <style>
+		.selected_grey {
+			background-color: #E0E0E0;
+		}
+	 </style>
+	 
+	<SCRIPT language="javascript">
+		
+		function createCell(cell, text, inputtype, inputname, inputvalue, inputstyle) {
+			var element = document.createElement("input");
+			element.type = inputtype;
+			element.name = inputname;
+			if(inputtype == "text"){
+				if(inputvalue !== undefined){
+					element.setAttribute('value', inputvalue);
+				}
+			}
+			element.setAttribute('class', inputstyle);
+			element.setAttribute('onfocus','onFocus(this, true);');
+			cell.appendChild(element);
+		}
+		
+		function onFocus(t, selected){
+			clearSelected();
+			
+			if (t.getAttribute('class') == 'col'){
+				console.log('col selected ' + t.closest('td').cellIndex);
+				var tcol = t.closest('td').cellIndex;			
+				var tbl = document.getElementById('my-table');
+				for (i = 0; i < tbl.rows.length; i++) {
+					if(selected){
+						tbl.rows[i].cells[tcol].setAttribute('class','selected_grey');
+					}
+				}
+			}else{
+				var trow = t.closest('tr');
+				if(selected){
+					trow.setAttribute('class', 'selected_grey');
+				}
+			}
+		}
+		
+		// append row to the HTML table
+		function appendRow(val) {
+			var tbl = document.getElementById('my-table'), // table reference
+				row = tbl.insertRow(tbl.rows.length),      // append table row
+				i,
+				inputtype,
+				inputname,
+				inputval;
+				
+			// insert table cells to the new row
+			for (i = 0; i < tbl.rows[0].cells.length; i++) {
+				switch(i){
+					case 0 : inputtype="text";
+							 inputname="txtbox[]";
+							 inputstyle="row";
+							 inputval=val;
+								console.log(inputval);
+							 break;
+					default:
+						inputtype="checkbox";
+						inputname="chk_new[]";
+						break;
+				}
+				
+				createCell( row.insertCell(i), i, inputtype, inputname, inputval, inputstyle);
+			}
+		}
+		 
+		 // append column to the HTML table
+		function appendColumn(val) {
+			var tbl = document.getElementById('my-table'), // table reference
+				i,
+				inputtype,
+				inputname,
+				inputval;
+			// open loop for each row and append cell
+			for (i = 0; i < tbl.rows.length; i++) {
+			
+				switch(i){
+					case 0 : inputtype="text";
+							 inputname="txtcol[]";
+							 inputstyle="col";
+							 inputval=val;
+							 break;
+					default:
+						inputtype="checkbox";
+						inputname="chk_new[]";
+						inputstyle="row";
+						break;
+				}
+				
+				createCell(tbl.rows[i].insertCell(tbl.rows[i].cells.length), i, inputtype, inputname, inputval, inputstyle);
+			}
+		}
+		
+		// delete table rows with index greater then 0
+		function deleteRow() {
+			$('#my-table tr[class="selected_grey"]').each(function(){
+				this.remove();
+			});
+		}
+		
+		function clearSelected(){
+			$('#my-table tr').each(function(){
+				 $('td', this).each(function () {
+					$(this).removeAttr('class');
+				});
+				$(this).removeAttr('class');
+			});
+		}
+		 
+		// delete table columns with index greater then 0
+		function deleteColumns() {
+			$('#my-table td[class="selected_grey"]').each(function(){
+				this.remove();
+			});
+		}
+		
+		function resetTable(){
+			$("#my-table").find("tr:gt(0)").remove();
+			$("#my-table").find("td:gt(0)").remove();
+		}
+		
+		function loadData(){
+		
+			resetTable();
+		
+			var sampleData = [["row1","col1",true],["row1","col2",false],["row1","col3",false],["row2","col1",false],["row2","col2",true],["row2","col3",true]];
+			
+			//get number of cols
+			var listofCols=[];
+			$.each(sampleData, function(i, v){
+				 if(listofCols.indexOf(v[1]) === -1){
+					listofCols.push(v[1]);
+					appendColumn(v[1]);
+				 }
+			});
+			
+			//get number of rows
+			var listofRows=[];
+			$.each(sampleData, function(i, v){
+				 if(listofRows.indexOf(v[0]) === -1){
+					listofRows.push(v[0]);
+					appendRow(v[0]);
+				 }
+			});
+			
+			//set value to checkbox
+			$.each(sampleData, function(i, v){
+				if(v[2]){
+					rowId=$("input[value='" + v[0] + "']").closest("tr").index();
+					colId=$("input[value='" + v[1] + "']").closest("td").index();
+					
+					$($('#my-table').find('tr:eq(' + (rowId) + ')').find('td:eq(' + (colId) + ')').find("input:checkbox")).each(function(i,v){
+						$(this).attr("checked", "checked");
+					});
+				
+				}
+			});
+			
+		}
+		
+		function getData(){
+			//get header column value
+			var data_header = [];
+			$('#my-table tr:first').each(function(){				
+				$('td', this).each(function () {
+					data_header.push($($(this)[0].children[0]).val());
+				});
+			});
+					
+			//construct result
+			var data=[];
+			var col = 0;
+			var row_value=""
+			$('#my-table tr').not(':first').each(function(){
+				$('td', this).each(function () {
+					if(col==0){
+						row_value=$($(this)[0].children[0]).val();
+					}else{
+						data.push([row_value, data_header[col], $($(this)[0].children[0]).is(':checked')]);
+					}
+					col++;
+				});
+				row_value="";
+				col = 0;
+			});
+			
+			$("#result").html(JSON.stringify(data));
+		}
+
+	</SCRIPT>
+</HEAD>
+<BODY>
+
+
+	<div style="border:1px solid black;">
+		Sample Data:<br/><br/>[["row1","col1",true],["row1","col2",false],["row1","col3",false],["row2","col1",false],["row2","col2",true],["row2","col3",true]]
+	</div><br/>
+	<INPUT type="button" value="Load Data Sample" onclick="loadData()" />
+	<br/><br/>
+	
+	<INPUT type="button" value="Add Row" onclick="appendRow()" />
+	<INPUT type="button" value="Delete Row" onclick="deleteRow()" />
+	<INPUT type="button" value="Add Column" onclick="appendColumn()" />
+	<INPUT type="button" value="Delete Column" onclick="deleteColumns()" />
+	<div style="border:1px solid black;">
+		<ul>
+			<li>To delete row, click on the textbox (row) to highlight the row and click "Delete Row" button</li>
+			<li>To delete column, click on the textbox (col) to highlight the column and click "Delete Column" button</li>
+		</ul>
+	</div>
+	<br/>
+	<TABLE id="my-table" width="350px" border="0.5px" cellpadding="0" cellspacing="0">
+		<TR>
+			<TD> Column Name </TD>
+		</TR>
+	</TABLE>
+	
+	<br/><br/>
+	<INPUT type="button" value="Get Data" onclick="getData()" />
+	<div style="border:1px solid black;">
+		Result:<br/><br/>
+		<span id="result">
+		</span>
+	</div>
+
+</BODY>
+</HTML>
