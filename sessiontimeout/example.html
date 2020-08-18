@@ -1,0 +1,39 @@
+ <html>
+ <head>
+	
+	<link rel="stylesheet" type="text/css" href="jquery-ui.css" />
+	
+	<script src="jquery-3.3.1.min.js"></script>
+	<script src="store.legacy.min.js"></script>
+	<script src="jquery-idleTimeout.js"></script>
+	<script src="jquery-ui.min.js"></script>
+	
+	<script type="text/javascript" charset="utf-8">
+		/*global $: false, jQuery: false, document: false, store: false, window: false, alert: false*/
+		/*jslint indent: 2, sloppy: true*/
+
+		$(document).ready(function () {
+
+			var idl = $(document).idleTimeout({
+				redirectUrl:'/logout',       // redirect to this url or to login
+				idleTimeLimit: 15,            // 15 seconds 'No activity' time limit in seconds.
+				activityEvents: 'click keypress scroll wheel mousewheel',    // separate each event with a space
+				dialogDisplayLimit: 10,       // Time to display the warning dialog before logout (and optional callback) in seconds
+				sessionKeepAliveTimer: false,  // Set to false to disable pings.
+				dialogTitle: 'Timeout Warning',
+				dialogText: 'Your session will be terminated when the countdown is 0',
+				dialogTimeRemaining: 'Time remaining',
+				dialogStayLoggedInButton: 'Continue',
+				dialogLogOutNowButton: 'Log Out',
+				dialogPriorLogout:true,
+				customCallback: false
+			});
+		});
+	  </script>
+	  
+</head>
+<body>
+	Test session timeout
+</body>
+</html>
+	  
