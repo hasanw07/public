@@ -52,13 +52,6 @@
       dialogStayLoggedInButton: 'Stay Logged In',
       dialogLogOutNowButton: 'Log Out Now',
 
-	  //20200714-Added by Hasan widjaya-Start
-      dialogPriorLogout: false,   //set to true if final message want to appear before logout or close tab
-      dialogPriorTitle: 'Session Expired', // also displays on browser title bar
-      dialogPriorText: 'Your session has timed out.',
-      dialogPriorExit: 'Exit',
-	  //20200714-Added by Hasan widjaya-End
-
       // error message if https://github.com/marcuswestin/store.js not enabled
       errorAlertMessage: 'Please disable "Private Mode", or upgrade to a modern browser. Or perhaps a dependent file missing. Please see: https://github.com/marcuswestin/store.js',
 
@@ -71,7 +64,6 @@
     //## Private Variables
     //##############################
       currentConfig = $.extend(defaultConfig, userRuntimeConfig), // merge default and user runtime configuration
-      forceTimeout = false,  //20201407-Added by Hasan Widjaya
       origTitle = document.title, // save original browser title
       activityDetector,
       startKeepSessionAlive, stopKeepSessionAlive, keepSession, keepAlivePing, // session keep alive
@@ -120,8 +112,6 @@
 
     //----------- IDLE TIMER FUNCTIONS --------------//
     checkIdleTimeout = function () {
-
-      if(forceTimeout) return;  //20200714-Added by Hasan
 
       var timeIdleTimeout = (store.get('idleTimerLastActivity') + (currentConfig.idleTimeLimit * 1000));
 
@@ -257,33 +247,8 @@
         currentConfig.customCallback();
       }
 
-	  //20200714-Modified by Hasan Widjaya-Start
-      if (currentConfig.dialogPriorLogout){
-        forceTimeout = true;
-        destroyWarningDialog();
-        stopDialogTimer();
-    
-        var dialogContent = "<div id='idletimer_final_dialog'><p>" + currentConfig.dialogPriorText + "</p></div>";
-
-        $(dialogContent).dialog({
-          buttons: [{
-            text: currentConfig.dialogPriorExit,
-            click: function () {
-              window.location.href = currentConfig.redirectUrl; 
-            }
-          }],
-          closeOnEscape: false,
-          modal: true,
-          title: currentConfig.dialogPriorTitle,
-          open: function () {
-            $(this).closest('.ui-dialog').find('.ui-dialog-titlebar-close').hide();
-          }
-        });
-      }else{
-        if (currentConfig.redirectUrl) {
-          window.location.href = currentConfig.redirectUrl;
-        }
-		//20200714-Modified by Hasan Widjaya-End
+      if (currentConfig.redirectUrl) {
+        window.location.href = currentConfig.redirectUrl;
       }
     };
 
