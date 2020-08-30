@@ -9,12 +9,14 @@
 	<script src="bootstrap.min.js"></script>
 	<script src="jquery-idleTimeout.js"></script>
 	<script src="jquery-ui.min.js"></script>
+	<script>
+		mpjQ =  $.noConflict();
+	</script>
 	
 	<script type="text/javascript" charset="utf-8">
-		/*global $: false, jQuery: false, document: false, store: false, window: false, alert: false*/
-		/*jslint indent: 2, sloppy: true*/
 
-		$(document).ready(function () {
+		//$(document).ready(function () {
+		jQuery( document ).ready(function( $ ) {
 
 			var idl = $(document).idleTimeout({
 				redirectUrl:'/logout',       // redirect to this url or to login
